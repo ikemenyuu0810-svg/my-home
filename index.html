@@ -1023,30 +1023,44 @@
     });
 
     // カード展開機能
-    function setupCard(cardId) {
-      const card = document.getElementById(cardId);
-      const compact = card.querySelector('.card-compact');
-      
-      compact.addEventListener('click', (e) => {
-        e.stopPropagation();
-        card.classList.add('expanded');
-      });
-      
-      card.addEventListener('click', (e) => {
-        if (card.classList.contains('expanded') && e.target === card) {
-          card.classList.remove('expanded');
-        }
-      });
+   // カード展開機能（修正版：クリック対象を明確化）
+function setupCard(cardId) {
+  const card = document.getElementById(cardId);
+  const compact = card.querySelector('.card-compact');
+  
+  // 1. コンパクトエリアがクリックされたら展開
+  compact.addEventListener('click', (e) => {
+    // クリックイベントが他の要素に伝播するのを防ぎ、確実に展開をトリガー
+    e.stopPropagation(); 
+    card.classList.add('expanded');
+  });
+  
+  // 2. 展開されたカードの空白エリアをクリック、またはEscapeキーで閉じる
+  // このイベントは、カード全体に対して設定し、e.targetがカード自体であるかを確認することで、
+  // カード内のボタンやテキストエリア操作時に閉じないようにします。
+  card.addEventListener('click', (e) => {
+    // クリックされた要素がカード（背景）そのものの場合に閉じる
+    if (card.classList.contains('expanded') && e.target === card) {
+      card.classList.remove('expanded');
     }
+  });
 
-    setupCard('clock-card');
-    setupCard('notifications-card');
-    setupCard('custom-timer-card');
-    setupCard('stopwatch-card');
-    setupCard('memo-card');
-    setupCard('todo-card');
-    setupCard('music-card');
+  // 3. Escapeキーで閉じる処理を追加
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && card.classList.contains('expanded')) {
+      card.classList.remove('expanded');
+    }
+  });
+}
 
+setupCard('clock-card');
+setupCard('notifications-card');
+setupCard('custom-timer-card');
+setupCard('stopwatch-card');
+setupCard('memo-card');
+setupCard('todo-card');
+setupCard('music-card');
+// 注意: 'pomodoro-card' は設計上、展開機能をつけないままにしてあります。
     // 時計
     function updateClock() {
       const now = new Date();
